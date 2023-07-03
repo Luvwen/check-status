@@ -20,8 +20,9 @@ client.on('ready', (client) => {
 });
 
 let lastTimeStatus = false;
-
-const pingToSwiss = (url, interval) => {
+let interval;
+let count = 0;
+const pingToSwiss = (url) => {
     const channel = client.channels.cache.get(process.env.CHANNEL_ID);
     fetch(url)
         .then((resp) => {
@@ -30,7 +31,7 @@ const pingToSwiss = (url, interval) => {
                 channel.send('@everyone VPN andando');
                 clearInterval(interval);
                 lastTimeStatus = true;
-                getRespFromSwiss('http://localhost:3000/', 10000);
+                getRespFromSwiss(process.env.URL, 10000);
             } else if (resp.status === 200 && lastTimeStatus) {
                 return;
             }
@@ -38,18 +39,18 @@ const pingToSwiss = (url, interval) => {
         .catch((error) => {
             clearInterval(interval);
             lastTimeStatus = false;
-            getRespFromSwiss('http://localhost:3000/', 5000);
-            console.log(`VPN inactiva`);
+            count = count + 1;
+            console.log(`VPN inactiva ${count}`);
+            getRespFromSwiss(process.env.URL, 10000);
         });
 };
 
 const getRespFromSwiss = (url, intervalTimer) => {
-    const interval = setInterval(() => {
-        pingToSwiss(url, interval);
+    interval = setInterval(() => {
+        pingToSwiss(url);
     }, intervalTimer);
 };
 
-// http://smg-devtools.swm.com.ar/smmp-wiki/index.php/Categor%C3%ADa:SGI
-getRespFromSwiss('http://localhost:3000/', 5000);
+getRespFromSwiss(process.env.URL, 5000);
 
 client.login(process.env.TOKEN);
