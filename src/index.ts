@@ -1,6 +1,5 @@
-const { Client, IntentsBitField, ActivityType } = require('discord.js');
-
 require('dotenv').config();
+const { Client, IntentsBitField, ActivityType } = require('discord.js');
 
 const client = new Client({
     intents: [
@@ -11,18 +10,24 @@ const client = new Client({
     ],
 });
 
-client.on('ready', (client) => {
-    console.log('Bot prendido');
-    client.user.setActivity({
-        name: 'Checking Status',
-        type: ActivityType.Playing,
-    });
-});
+client.on(
+    'ready',
+    (client: {
+        user: { setActivity: (arg0: { name: string; type: any }) => void };
+    }) => {
+        console.log('Bot prendido');
+        client.user.setActivity({
+            name: 'Checking Status',
+            type: ActivityType.Playing,
+        });
+    }
+);
 
 let lastTimeStatus = false;
-let interval;
+let interval: ReturnType<typeof setInterval>;
 let count = 0;
-const pingToSwiss = (url) => {
+
+const pingToSwiss = (url: string) => {
     const channel = client.channels.cache.get(process.env.CHANNEL_ID);
     fetch(url)
         .then((resp) => {
@@ -31,26 +36,26 @@ const pingToSwiss = (url) => {
                 channel.send('@everyone VPN andando');
                 clearInterval(interval);
                 lastTimeStatus = true;
-                getRespFromSwiss(process.env.URL, 10000);
+                getRespFromSwiss(process.env.URL as string, 10000);
             } else if (resp.status === 200 && lastTimeStatus) {
                 return;
             }
         })
-        .catch((error) => {
+        .catch((error: Error) => {
             clearInterval(interval);
             lastTimeStatus = false;
             count = count + 1;
             console.log(`VPN inactiva ${count}`);
-            getRespFromSwiss(process.env.URL, 10000);
+            getRespFromSwiss(process.env.URL as string, 10000);
         });
 };
 
-const getRespFromSwiss = (url, intervalTimer) => {
+const getRespFromSwiss = (url: string, intervalTimer: number) => {
     interval = setInterval(() => {
         pingToSwiss(url);
     }, intervalTimer);
 };
 
-getRespFromSwiss(process.env.URL, 5000);
+getRespFromSwiss(process.env.URL as string, 5000);
 
 client.login(process.env.TOKEN);
