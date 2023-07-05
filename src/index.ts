@@ -43,6 +43,9 @@ const pingToSwiss = (url: string) => {
         })
         .catch((error: Error) => {
             clearInterval(interval);
+            if(lastTimeStatus){
+                channel.send('@everyone VPN caida')
+            }
             lastTimeStatus = false;
             count = count + 1;
             console.log(`VPN inactiva ${count}`);

@@ -2,6 +2,8 @@
 
 ### How to make it work?
 
+-   Create and config bot privileges in the discord developer page.
+
 -   Git clone the repo.
 
     `git clone https://github.com/Luvwen/check-status.git`
